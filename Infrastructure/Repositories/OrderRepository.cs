@@ -77,5 +77,13 @@ namespace Infrastructure.Repositories
                     .ThenInclude(od => od.Product)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
+        public async Task<Order?> GetOrderByIdForUpdateAsync(Guid orderId)
+        {
+            return await _context.Orders
+                // Không có AsNoTracking() để EF Core theo dõi phục vụ update
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
     }
 }

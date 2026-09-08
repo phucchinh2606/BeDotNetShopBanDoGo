@@ -1,4 +1,5 @@
-﻿using Application.Commands.Orders.CreateOrder;
+﻿using Application.Commands.Orders.CancelOrder;
+using Application.Commands.Orders.CreateOrder;
 using Application.Commons.Models;
 using Application.Queries.Orders.GetOrderById;
 using Application.Queries.Orders.GetUserOrders;
@@ -68,6 +69,28 @@ namespace API.Controllers
 
             var query = new GetOrderByIdQuery(id, userId);
             var result = await _mediator.Send(query);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("{id:guid}/cancel")]
+        public async Task<IActionResult> CancelOrder(Guid id, [FromBody] CancelOrderCommand command)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(ApiResponse<object>.FailureResult("Bạn chưa đăng nhập hoặc Token không hợp lệ."));
+            }
+
+            command.OrderId = id;
+            command.UserId = userId;
+
+            var result = await _mediator.Send(command);
 
             if (!result.Success)
             {
