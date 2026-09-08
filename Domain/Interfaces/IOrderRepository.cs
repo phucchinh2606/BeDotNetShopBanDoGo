@@ -13,5 +13,8 @@ namespace Domain.Interfaces
             OrderStatus? orderStatus,
             PaymentStatus? paymentStatus,
             string? searchTerm);
+
+        // Bổ sung hàm lấy chi tiết 1 đơn hàng bao gồm OrderDetails & Product
+        Task<Order?> GetOrderByIdWithDetailsAsync(Guid orderId);
     }
 }

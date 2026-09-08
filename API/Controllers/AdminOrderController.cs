@@ -1,4 +1,5 @@
 ﻿using Application.Queries.Orders.GetAdminOrders;
+using Application.Queries.Orders.GetOrderById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,20 @@ namespace API.Controllers
         public async Task<IActionResult> GetOrders([FromQuery] GetAdminOrdersQuery query)
         {
             var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetOrderByIdForAdmin(Guid id)
+        {
+            var query = new GetOrderByIdQuery(id, userId: null); // UserId = null cho phép Admin xem mọi đơn hàng
+            var result = await _mediator.Send(query);
+
+            if (!result.Success)
+            {
+                return NotFound(result);
+            }
+
             return Ok(result);
         }
     }

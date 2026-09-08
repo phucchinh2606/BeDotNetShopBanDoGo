@@ -68,5 +68,14 @@ namespace Infrastructure.Repositories
 
             return (orders, totalCount);
         }
+
+        public async Task<Order?> GetOrderByIdWithDetailsAsync(Guid orderId)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
     }
 }
