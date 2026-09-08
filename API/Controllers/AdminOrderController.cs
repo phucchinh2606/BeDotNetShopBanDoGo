@@ -1,4 +1,5 @@
-﻿using Application.Queries.Orders.GetAdminOrders;
+﻿using Application.Commands.Orders.UpdateOrderStatus;
+using Application.Queries.Orders.GetAdminOrders;
 using Application.Queries.Orders.GetOrderById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,20 @@ namespace API.Controllers
             if (!result.Success)
             {
                 return NotFound(result);
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("{id:guid}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusCommand command)
+        {
+            command.OrderId = id;
+            var result = await _mediator.Send(command);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
             }
 
             return Ok(result);
