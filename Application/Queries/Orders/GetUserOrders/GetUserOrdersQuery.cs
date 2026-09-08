@@ -2,7 +2,7 @@
 using Application.Commons.Models;
 using MediatR;
 
-namespace Application.Commands.Orders.GetUserOrders
+namespace Application.Queries.Orders.GetUserOrders
 {
     public class GetUserOrdersQuery : IRequest<ApiResponse<List<OrderDto>>>
     {

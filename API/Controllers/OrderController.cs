@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Orders.CreateOrder;
-using Application.Commands.Orders.GetUserOrders;
 using Application.Commons.Models;
+using Application.Queries.Orders.GetUserOrders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

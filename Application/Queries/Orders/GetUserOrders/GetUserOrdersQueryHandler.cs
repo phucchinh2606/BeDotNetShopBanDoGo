@@ -4,7 +4,7 @@ using AutoMapper;
 using Domain.Interfaces;
 using MediatR;
 
-namespace Application.Commands.Orders.GetUserOrders
+namespace Application.Queries.Orders.GetUserOrders
 {
     public class GetUserOrdersQueryHandler : IRequestHandler<GetUserOrdersQuery, ApiResponse<List<OrderDto>>>
     {
