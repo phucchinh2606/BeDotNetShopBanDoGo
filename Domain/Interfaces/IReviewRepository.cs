@@ -1,9 +1,10 @@
 ﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Domain.Interfaces
 {
-    public interface IReviewRepository : IGenericRepository<Review> { }
+    public interface IReviewRepository : IGenericRepository<Review>
+    {
+        Task<Review?> GetReviewByUserAndProductAsync(Guid userId, Guid productId);
+        Task<IEnumerable<Review>> GetReviewsByProductIdAsync(Guid productId);
+    }
 }
