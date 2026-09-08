@@ -1,4 +1,5 @@
 ﻿using Application.Commands.Orders.CreateOrder;
+using Application.Commands.Orders.GetUserOrders;
 using Application.Commons.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,21 @@ namespace API.Controllers
             {
                 return BadRequest(result);
             }
+
+            return Ok(result);
+        }
+
+        [HttpGet("my-orders")]
+        public async Task<IActionResult> GetMyOrders()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(ApiResponse<object>.FailureResult("Bạn chưa đăng nhập hoặc Token không hợp lệ."));
+            }
+
+            var query = new GetUserOrdersQuery(userId);
+            var result = await _mediator.Send(query);
 
             return Ok(result);
         }

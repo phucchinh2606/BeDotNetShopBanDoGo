@@ -1,9 +1,8 @@
 ﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Domain.Interfaces
 {
-    public interface IOrderRepository : IGenericRepository<Order> { }
+    public interface IOrderRepository : IGenericRepository<Order> {
+        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId);
+    }
 }
