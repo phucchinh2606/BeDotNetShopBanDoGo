@@ -8,6 +8,7 @@
         public string? UserName { get; set; } // Hiển thị tên người đánh giá
         public int Rating { get; set; }
         public string Comment { get; set; } = string.Empty;
+        public List<string> ImageUrls { get; set; } = new List<string>();
         public DateTime CreatedAt { get; set; }
     }
 }

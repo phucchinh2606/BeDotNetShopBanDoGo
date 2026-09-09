@@ -12,7 +12,7 @@ namespace Domain.Entities
         public int Rating { get; set; }
         public string Comment { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        public List<string> ImageUrls { get; set; } = new List<string>();
         public Product Product { get; set; }
         public User User { get; set; }
     }

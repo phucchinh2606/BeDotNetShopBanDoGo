@@ -21,7 +21,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateReview([FromBody] CreateReviewCommand command)
+        public async Task<IActionResult> CreateReview([FromForm] CreateReviewCommand command)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
@@ -53,5 +53,7 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
+
     }
 }
