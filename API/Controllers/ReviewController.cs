@@ -1,4 +1,5 @@
 ﻿using Application.Commands.Reviews.CreateReview;
+using Application.Commands.Reviews.GetProductReviews;
 using Application.Commons.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,20 @@ namespace API.Controllers
             if (!result.Success)
             {
                 return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet("product/{productId:guid}")]
+        public async Task<IActionResult> GetProductReviews(Guid productId)
+        {
+            var query = new GetProductReviewsQuery(productId);
+            var result = await _mediator.Send(query);
+
+            if (!result.Success)
+            {
+                return NotFound(result);
             }
 
             return Ok(result);
