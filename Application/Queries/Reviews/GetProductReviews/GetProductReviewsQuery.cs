@@ -2,7 +2,7 @@
 using Application.Commons.Models;
 using MediatR;
 
-namespace Application.Commands.Reviews.GetProductReviews
+namespace Application.Queries.Reviews.GetProductReviews
 {
     public class GetProductReviewsQuery : IRequest<ApiResponse<IEnumerable<ReviewDto>>>
     {

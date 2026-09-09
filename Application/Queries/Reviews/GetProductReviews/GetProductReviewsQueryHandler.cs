@@ -4,7 +4,7 @@ using AutoMapper;
 using Domain.Interfaces;
 using MediatR;
 
-namespace Application.Commands.Reviews.GetProductReviews
+namespace Application.Queries.Reviews.GetProductReviews
 {
     public class GetProductReviewsQueryHandler : IRequestHandler<GetProductReviewsQuery, ApiResponse<IEnumerable<ReviewDto>>>
     {

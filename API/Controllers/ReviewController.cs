@@ -1,6 +1,6 @@
 ﻿using Application.Commands.Reviews.CreateReview;
-using Application.Commands.Reviews.GetProductReviews;
 using Application.Commons.Models;
+using Application.Queries.Reviews.GetProductReviews;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
