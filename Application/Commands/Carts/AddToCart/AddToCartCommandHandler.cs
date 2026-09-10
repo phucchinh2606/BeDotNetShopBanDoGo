@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Entities;
@@ -22,20 +23,20 @@ namespace Application.Commands.Carts.AddToCart
         {
             if (request.Quantity <= 0)
             {
-                return ApiResponse<CartDto>.FailureResult("Số lượng sản phẩm phải lớn hơn 0.");
+                throw new BadRequestException("Số lượng sản phẩm phải lớn hơn 0.");
             }
 
             // 1. Kiểm tra sản phẩm có tồn tại không
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Sản phẩm không tồn tại.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
             // 2. Kiểm tra số lượng tồn kho
             if (product.StockQuantity < request.Quantity)
             {
-                return ApiResponse<CartDto>.FailureResult($"Sản phẩm chỉ còn lại {product.StockQuantity} trong kho.");
+                throw new BadRequestException($"Sản phẩm chỉ còn lại {product.StockQuantity} trong kho.");
             }
 
             // 3. Lấy hoặc tạo Giỏ hàng cho User
@@ -49,7 +50,7 @@ namespace Application.Commands.Carts.AddToCart
                 int newQuantity = existingCartItem.Quantity + request.Quantity;
                 if (product.StockQuantity < newQuantity)
                 {
-                    return ApiResponse<CartDto>.FailureResult($"Không thể thêm. Tổng số lượng trong giỏ ({newQuantity}) vượt quá số lượng tồn kho ({product.StockQuantity}).");
+                    throw new BadRequestException($"Không thể thêm. Tổng số lượng trong giỏ ({newQuantity}) vượt quá số lượng tồn kho ({product.StockQuantity}).");
                 }
                 existingCartItem.Quantity = newQuantity;
                 _unitOfWork.CartItems.Update(existingCartItem);

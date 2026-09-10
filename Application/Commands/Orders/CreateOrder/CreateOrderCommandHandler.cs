@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Interfaces;
 using Application.Commons.Models;
 using AutoMapper;
@@ -25,20 +26,20 @@ namespace Application.Commands.Orders.CreateOrder
         {
             if (string.IsNullOrWhiteSpace(request.ShippingAddress))
             {
-                return ApiResponse<OrderDto>.FailureResult("Địa chỉ giao hàng không được để trống.");
+                throw new BadRequestException("Địa chỉ giao hàng không được để trống.");
             }
 
             // 1. Kiểm tra danh sách sản phẩm được chọn
             if (request.SelectedCartItemIds == null || !request.SelectedCartItemIds.Any())
             {
-                return ApiResponse<OrderDto>.FailureResult("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+                throw new BadRequestException("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
             }
 
             // 2. Lấy giỏ hàng của User
             var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(request.UserId);
             if (cart == null || !cart.CartItems.Any())
             {
-                return ApiResponse<OrderDto>.FailureResult("Giỏ hàng của bạn đang trống.");
+                throw new BadRequestException("Giỏ hàng của bạn đang trống.");
             }
 
             // 3. Lọc danh sách CartItems theo danh sách SelectedCartItemIds người dùng chọn
@@ -48,7 +49,7 @@ namespace Application.Commands.Orders.CreateOrder
 
             if (!selectedCartItems.Any())
             {
-                return ApiResponse<OrderDto>.FailureResult("Các sản phẩm được chọn không tồn tại trong giỏ hàng.");
+                throw new BadRequestException("Các sản phẩm được chọn không tồn tại trong giỏ hàng.");
             }
 
             // 4. Kiểm tra tồn kho cho các sản phẩm ĐÃ CHỌN
@@ -57,7 +58,7 @@ namespace Application.Commands.Orders.CreateOrder
                 var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
                 if (product == null || product.StockQuantity < item.Quantity)
                 {
-                    return ApiResponse<OrderDto>.FailureResult($"Sản phẩm '{item.Product?.ProductName}' không đủ số lượng tồn kho.");
+                    throw new BadRequestException($"Sản phẩm '{item.Product?.ProductName}' không đủ số lượng tồn kho.");
                 }
             }
 
@@ -93,19 +94,19 @@ namespace Application.Commands.Orders.CreateOrder
                 }
             }
 
-            // 7. Gọi IPaymentService qua PaymentFactory (Giữ nguyên Factory Pattern cho thanh toán)
+            // 7. Gọi IPaymentService qua PaymentFactory
             var paymentService = _paymentFactory.GetPaymentService(request.PaymentMethod);
             var paymentResult = await paymentService.ProcessPaymentAsync(order);
 
             if (!paymentResult.IsSuccess)
             {
-                return ApiResponse<OrderDto>.FailureResult($"Thanh toán thất bại: {paymentResult.Message}");
+                throw new BadRequestException($"Thanh toán thất bại: {paymentResult.Message}");
             }
 
             // 8. Lưu đơn hàng
             await _unitOfWork.Orders.AddAsync(order);
 
-            // 9. CHỈ XÓA CÁC CARTITEM ĐÃ ĐƯỢC CHỌN (Không xóa sạch cả giỏ hàng)
+            // 9. CHỈ XÓA CÁC CARTITEM ĐÃ ĐƯỢC CHỌN
             foreach (var item in selectedCartItems)
             {
                 _unitOfWork.CartItems.Delete(item);

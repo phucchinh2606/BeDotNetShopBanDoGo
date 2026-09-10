@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Enums;
@@ -24,7 +25,7 @@ namespace Application.Commands.Orders.UpdateOrderStatus
             var order = await _unitOfWork.Orders.GetOrderByIdWithDetailsAsync(request.OrderId);
             if (order == null)
             {
-                return ApiResponse<OrderDto>.FailureResult("Không tìm thấy đơn hàng.");
+                throw new NotFoundException("Đơn hàng", request.OrderId);
             }
 
             // 2. Logic hoàn tồn kho nếu đơn hàng bị hủy (Nếu đơn chưa bị hủy trước đó)

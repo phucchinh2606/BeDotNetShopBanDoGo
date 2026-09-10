@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Commons.Exceptions;
+using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -23,7 +24,7 @@ namespace Application.Commands.Categories.CreateCategory
                 var parentCategory = await _unitOfWork.Categories.GetByIdAsync(request.ParentId.Value);
                 if (parentCategory == null)
                 {
-                    throw new Exception("Danh mục cha không tồn tại.");
+                    throw new NotFoundException("Danh mục cha không tồn tại.");
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Enums;
@@ -24,24 +25,24 @@ namespace Application.Commands.Orders.CancelOrder
             var order = await _unitOfWork.Orders.GetOrderByIdForUpdateAsync(request.OrderId);
             if (order == null)
             {
-                return ApiResponse<OrderDto>.FailureResult("Không tìm thấy đơn hàng.");
+                throw new NotFoundException("Đơn hàng", request.OrderId);
             }
 
             // 2. Kiểm tra quyền sở hữu đơn hàng của User
             if (order.UserId != request.UserId)
             {
-                return ApiResponse<OrderDto>.FailureResult("Bạn không có quyền hủy đơn hàng này.");
+                throw new ForbiddenException("Bạn không có quyền hủy đơn hàng này.");
             }
 
             // 3. Kiểm tra điều kiện trạng thái đơn
             if (order.OrderStatus == OrderStatus.Shipping || order.OrderStatus == OrderStatus.Delivered)
             {
-                return ApiResponse<OrderDto>.FailureResult("Không thể hủy đơn hàng do đơn đã được vận chuyển hoặc giao thành công.");
+                throw new BadRequestException("Không thể hủy đơn hàng do đơn đã được vận chuyển hoặc giao thành công.");
             }
 
             if (order.OrderStatus == OrderStatus.Cancelled)
             {
-                return ApiResponse<OrderDto>.FailureResult("Đơn hàng này đã được hủy trước đó.");
+                throw new BadRequestException("Đơn hàng này đã được hủy trước đó.");
             }
 
             // 4. Hoàn lại số lượng tồn kho trực tiếp từ Navigation Property detail.Product
@@ -49,7 +50,6 @@ namespace Application.Commands.Orders.CancelOrder
             {
                 if (detail.Product != null)
                 {
-                    // Tăng số lượng tồn kho trực tiếp trên entity đã được track sẵn
                     detail.Product.StockQuantity += detail.Quantity;
                 }
             }

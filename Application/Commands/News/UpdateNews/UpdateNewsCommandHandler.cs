@@ -1,4 +1,5 @@
-﻿using Application.Commons.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Interfaces;
 using Application.Commons.Models;
 using Domain.Interfaces;
 using MediatR;
@@ -24,14 +25,14 @@ namespace Application.Commands.News.UpdateNews
             var news = await _unitOfWork.News.GetByIdAsync(request.NewsId);
             if (news == null)
             {
-                return ApiResponse<bool>.FailureResult("Không tìm thấy bài viết tin tức cần cập nhật.");
+                throw new NotFoundException("Bài viết tin tức", request.NewsId);
             }
 
             // 2. Kiểm tra Tác giả có tồn tại không
             var author = await _unitOfWork.Users.GetByIdAsync(request.AuthorId);
             if (author == null)
             {
-                return ApiResponse<bool>.FailureResult("Tác giả không tồn tại trên hệ thống.");
+                throw new NotFoundException("Tác giả không tồn tại trên hệ thống.");
             }
 
             // 3. Upload ảnh mới nếu người dùng đính kèm file

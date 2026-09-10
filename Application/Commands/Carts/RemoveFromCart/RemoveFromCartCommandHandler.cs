@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -23,14 +24,14 @@ namespace Application.Commands.Carts.RemoveFromCart
             var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(request.UserId);
             if (cart == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Không tìm thấy giỏ hàng của người dùng.");
+                throw new NotFoundException("Không tìm thấy giỏ hàng của người dùng.");
             }
 
             // 2. Kiểm tra sản phẩm có nằm trong giỏ hàng không
             var cartItem = await _unitOfWork.CartItems.GetCartItemAsync(cart.CartId, request.ProductId);
             if (cartItem == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Sản phẩm không có trong giỏ hàng.");
+                throw new NotFoundException("Sản phẩm không có trong giỏ hàng.");
             }
 
             // 3. Thực hiện xóa item khỏi giỏ hàng

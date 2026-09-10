@@ -1,4 +1,5 @@
-﻿using Application.Commons.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Interfaces;
 using Application.Commons.Models;
 using Domain.Interfaces;
 using MediatR;
@@ -24,7 +25,7 @@ namespace Application.Commands.News.CreateNews
             var author = await _unitOfWork.Users.GetByIdAsync(request.AuthorId);
             if (author == null)
             {
-                return ApiResponse<Guid>.FailureResult("Tác giả không tồn tại trên hệ thống.");
+                throw new NotFoundException("Tác giả không tồn tại trên hệ thống.");
             }
 
             // 2. Upload ảnh tin tức lên Cloudinary (nếu có truyền file)

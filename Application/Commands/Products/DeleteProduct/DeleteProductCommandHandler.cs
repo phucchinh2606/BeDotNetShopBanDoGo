@@ -1,4 +1,5 @@
-﻿using Application.Commons.Models;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Models;
 using Domain.Interfaces;
 using MediatR;
 
@@ -19,7 +20,7 @@ namespace Application.Commands.Products.DeleteProduct
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return ApiResponse<bool>.FailureResult("Không tìm thấy sản phẩm cần xóa.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
             // 2. Thực hiện xóa sản phẩm

@@ -1,11 +1,8 @@
-﻿using BCrypt.Net;
+﻿using Application.Commons.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Interfaces;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Application.Commands.Auth.Register
 {
@@ -24,7 +21,7 @@ namespace Application.Commands.Auth.Register
             var existingUser = await _unitOfWork.Users.GetByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                throw new System.Exception("Email này đã được sử dụng.");
+                throw new BadRequestException("Email này đã được sử dụng.");
             }
 
             // 2. Mã hóa mật khẩu bằng BCrypt

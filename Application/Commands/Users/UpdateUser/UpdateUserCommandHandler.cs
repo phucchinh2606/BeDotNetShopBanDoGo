@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Commons.Exceptions;
+using AutoMapper;
 using Domain.Interfaces;
 using MediatR;
 
@@ -20,7 +21,7 @@ namespace Application.Commands.Users.UpdateUser
             var user = await _unitOfWork.Users.GetByIdAsync(request.UserId);
             if (user == null)
             {
-                throw new Exception("Không tìm thấy người dùng với ID này.");
+                throw new NotFoundException("Người dùng", request.UserId);
             }
 
             // Ghi đè thông tin mới từ Command vào Entity User hiện tại

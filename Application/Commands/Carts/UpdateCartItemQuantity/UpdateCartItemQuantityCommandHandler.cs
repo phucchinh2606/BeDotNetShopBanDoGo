@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -22,33 +23,33 @@ namespace Application.Commands.Carts.UpdateCartItemQuantity
             // 1. Ràng buộc tối thiểu số lượng phải >= 1
             if (request.Quantity < 1)
             {
-                return ApiResponse<CartDto>.FailureResult("Số lượng sản phẩm trong giỏ hàng tối thiểu phải là 1.");
+                throw new BadRequestException("Số lượng sản phẩm trong giỏ hàng tối thiểu phải là 1.");
             }
 
             // 2. Lấy giỏ hàng của User
             var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(request.UserId);
             if (cart == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Không tìm thấy giỏ hàng của người dùng.");
+                throw new NotFoundException("Không tìm thấy giỏ hàng của người dùng.");
             }
 
             // 3. Kiểm tra sản phẩm có trong giỏ hàng không
             var cartItem = await _unitOfWork.CartItems.GetCartItemAsync(cart.CartId, request.ProductId);
             if (cartItem == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Sản phẩm không có trong giỏ hàng.");
+                throw new NotFoundException("Sản phẩm không có trong giỏ hàng.");
             }
 
             // 4. Kiểm tra số lượng tồn kho của sản phẩm
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return ApiResponse<CartDto>.FailureResult("Sản phẩm không tồn tại.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
             if (request.Quantity > product.StockQuantity)
             {
-                return ApiResponse<CartDto>.FailureResult($"Số lượng yêu cầu ({request.Quantity}) vượt quá số lượng hàng còn lại trong kho ({product.StockQuantity}).");
+                throw new BadRequestException($"Số lượng yêu cầu ({request.Quantity}) vượt quá số lượng hàng còn lại trong kho ({product.StockQuantity}).");
             }
 
             // 5. Cập nhật số lượng

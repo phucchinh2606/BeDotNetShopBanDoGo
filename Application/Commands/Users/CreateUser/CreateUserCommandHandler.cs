@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Commons.Exceptions;
+using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -21,7 +22,7 @@ namespace Application.Commands.Users.CreateUser
             var existingUser = await _unitOfWork.Users.GetByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email này đã được sử dụng bởi tài khoản khác.");
+                throw new BadRequestException("Email này đã được sử dụng bởi tài khoản khác.");
             }
 
             // Map request sang User entity

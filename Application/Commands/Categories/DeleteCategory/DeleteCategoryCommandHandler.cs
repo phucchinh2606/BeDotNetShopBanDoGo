@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Commands.Categories.DeleteCategory
@@ -17,7 +18,7 @@ namespace Application.Commands.Categories.DeleteCategory
             var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
-                throw new Exception("Không tìm thấy danh mục cần xóa.");
+                throw new NotFoundException("Danh mục", request.CategoryId);
             }
 
             // Kiểm tra xem danh mục này có chứa danh mục con nào không
@@ -25,7 +26,7 @@ namespace Application.Commands.Categories.DeleteCategory
             var hasSubCategories = allCategories.Any(c => c.ParentId == request.CategoryId);
             if (hasSubCategories)
             {
-                throw new Exception("Không thể xóa danh mục này vì vẫn còn các danh mục con bên trong. Vui lòng xóa hoặc di chuyển các danh mục con trước.");
+                throw new BadRequestException("Không thể xóa danh mục này vì vẫn còn các danh mục con bên trong.");
             }
 
             _unitOfWork.Categories.Delete(category);

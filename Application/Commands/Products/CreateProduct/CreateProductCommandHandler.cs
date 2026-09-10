@@ -1,4 +1,5 @@
-﻿using Application.Commons.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -25,7 +26,7 @@ namespace Application.Commands.Products.CreateProduct
             var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
-                throw new Exception("Danh mục sản phẩm không tồn tại.");
+                throw new NotFoundException("Danh mục sản phẩm", request.CategoryId);
             }
 
             // 2. Map request command sang Entity Product

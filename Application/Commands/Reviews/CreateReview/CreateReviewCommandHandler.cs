@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Interfaces;
 using Application.Commons.Models;
 using AutoMapper;
@@ -27,14 +28,14 @@ namespace Application.Commands.Reviews.CreateReview
             // 1. Validate Rating
             if (request.Rating < 1 || request.Rating > 5)
             {
-                return ApiResponse<ReviewDto>.FailureResult("Điểm đánh giá phải từ 1 đến 5 sao.");
+                throw new BadRequestException("Điểm đánh giá phải từ 1 đến 5 sao.");
             }
 
             // 2. Kiểm tra User tồn tại
             var user = await _unitOfWork.Users.GetByIdAsync(request.UserId);
             if (user == null)
             {
-                return ApiResponse<ReviewDto>.FailureResult("Người dùng không tồn tại.");
+                throw new NotFoundException("Người dùng", request.UserId);
             }
 
             // 3. Kiểm tra đơn hàng đã giao (Delivered) chứa sản phẩm này chưa
@@ -45,38 +46,30 @@ namespace Application.Commands.Reviews.CreateReview
 
             if (!hasPurchasedAndDelivered)
             {
-                return ApiResponse<ReviewDto>.FailureResult("Bạn chỉ có thể đánh giá sản phẩm sau khi đơn hàng chứa sản phẩm đã được giao thành công.");
+                throw new BadRequestException("Bạn chỉ có thể đánh giá sản phẩm sau khi đơn hàng chứa sản phẩm đã được giao thành công.");
             }
 
             // 4. Kiểm tra đã đánh giá chưa
             var existingReview = await _unitOfWork.Reviews.GetReviewByUserAndProductAsync(request.UserId, request.ProductId);
             if (existingReview != null)
             {
-                return ApiResponse<ReviewDto>.FailureResult("Bạn đã đánh giá sản phẩm này rồi.");
+                throw new BadRequestException("Bạn đã đánh giá sản phẩm này rồi.");
             }
 
             // 5. Upload hình ảnh lên Cloudinary nếu có đính kèm file
             var imageUrls = new List<string>();
             if (request.Images != null && request.Images.Any())
             {
-                try
+                foreach (var file in request.Images)
                 {
-                    foreach (var file in request.Images)
+                    if (file.Length > 0)
                     {
-                        if (file.Length > 0)
+                        var photoUrl = await _photoService.UploadPhotoAsync(file, "reviews");
+                        if (!string.IsNullOrEmpty(photoUrl))
                         {
-                            // UploadPhotoAsync trả về trực tiếp chuỗi URL (string)
-                            var photoUrl = await _photoService.UploadPhotoAsync(file, "reviews");
-                            if (!string.IsNullOrEmpty(photoUrl))
-                            {
-                                imageUrls.Add(photoUrl);
-                            }
+                            imageUrls.Add(photoUrl);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    return ApiResponse<ReviewDto>.FailureResult($"Lỗi khi tải ảnh lên Cloudinary: {ex.Message}");
                 }
             }
 

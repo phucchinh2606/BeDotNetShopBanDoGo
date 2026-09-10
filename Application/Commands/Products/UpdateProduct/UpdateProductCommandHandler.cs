@@ -1,4 +1,5 @@
-﻿using Application.Commons.Models;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Models;
 using Domain.Interfaces;
 using MediatR;
 
@@ -7,13 +8,10 @@ namespace Application.Commands.Products.UpdateProduct
     public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, ApiResponse<bool>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        // Giả định bạn có IFileService/ICloudinaryService để lưu file ảnh
-        // private readonly IFileService _fileService; 
 
-        public UpdateProductCommandHandler(IUnitOfWork unitOfWork /*, IFileService fileService*/)
+        public UpdateProductCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            // _fileService = fileService;
         }
 
         public async Task<ApiResponse<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -22,14 +20,14 @@ namespace Application.Commands.Products.UpdateProduct
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return ApiResponse<bool>.FailureResult("Không tìm thấy sản phẩm cần cập nhật.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
             // 2. Kiểm tra Danh mục có tồn tại hay không
             var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
-                return ApiResponse<bool>.FailureResult("Danh mục không tồn tại.");
+                throw new NotFoundException("Danh mục sản phẩm", request.CategoryId);
             }
 
             // 3. Xử lý ảnh mới (nếu có upload)

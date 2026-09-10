@@ -1,4 +1,5 @@
-﻿using Application.Commons.Models;
+﻿using Application.Commons.Exceptions;
+using Application.Commons.Models;
 using Domain.Interfaces;
 using MediatR;
 
@@ -19,7 +20,7 @@ namespace Application.Commands.News.DeleteNews
             var news = await _unitOfWork.News.GetByIdAsync(request.NewsId);
             if (news == null)
             {
-                return ApiResponse<bool>.FailureResult("Không tìm thấy bài viết tin tức cần xóa.");
+                throw new NotFoundException("Bài viết tin tức", request.NewsId);
             }
 
             // 2. Thực hiện xóa bài viết

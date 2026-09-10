@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Commands.Users.DeleteUser
@@ -17,7 +18,7 @@ namespace Application.Commands.Users.DeleteUser
             var user = await _unitOfWork.Users.GetByIdAsync(request.UserId);
             if (user == null)
             {
-                throw new Exception("Không tìm thấy người dùng với ID này.");
+                throw new NotFoundException("Người dùng", request.UserId);
             }
 
             _unitOfWork.Users.Delete(user);

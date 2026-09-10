@@ -1,4 +1,5 @@
 using API;
+using API.Middlewares;
 using Application.Commons.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -57,7 +58,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // mở Swagger UI tại root
     });
 }
-
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

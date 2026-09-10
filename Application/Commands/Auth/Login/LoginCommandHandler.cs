@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Application.Commons.Exceptions;
+using Domain.Interfaces;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -23,14 +24,14 @@ namespace Application.Commands.Auth.Login
             var user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new System.Exception("Email không tồn tại trong hệ thống.");
+                throw new NotFoundException("Email không tồn tại trong hệ thống.");
             }
 
             // 2. Kiểm tra tính chính xác của mật khẩu đã được mã hóa bằng BCrypt
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
             if (!isPasswordValid)
             {
-                throw new System.Exception("Mật khẩu không chính xác.");
+                throw new UnauthorizedException("Mật khẩu không chính xác.");
             }
 
             // 3. Sinh JWT Token thông qua ITokenService[cite: 18]
