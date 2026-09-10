@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -23,10 +24,10 @@ namespace Application.Queries.Reviews.GetProductReviews
             var product = await _unitOfWork.Products.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return ApiResponse<IEnumerable<ReviewDto>>.FailureResult("Sản phẩm không tồn tại.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
-            // Lấy danh sách Review kèm thông tin User (Đã có Include User và AsNoTracking ở Repository)
+            // Lấy danh sách Review kèm thông tin User
             var reviews = await _unitOfWork.Reviews.GetReviewsByProductIdAsync(request.ProductId);
 
             var reviewDtos = _mapper.Map<IEnumerable<ReviewDto>>(reviews);

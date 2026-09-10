@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -23,7 +24,7 @@ namespace Application.Queries.News.GetNewsById
 
             if (news == null)
             {
-                return ApiResponse<NewsDto>.FailureResult("Không tìm thấy bài viết tin tức.");
+                throw new NotFoundException("Bài viết tin tức", request.NewsId);
             }
 
             var newsDto = _mapper.Map<NewsDto>(news);

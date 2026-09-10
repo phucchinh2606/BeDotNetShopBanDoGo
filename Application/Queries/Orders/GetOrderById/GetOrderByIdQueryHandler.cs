@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -23,13 +24,13 @@ namespace Application.Queries.Orders.GetOrderById
 
             if (order == null)
             {
-                return ApiResponse<OrderDto>.FailureResult("Không tìm thấy đơn hàng.");
+                throw new NotFoundException("Đơn hàng", request.OrderId);
             }
 
             // Nếu request đến từ Client (có UserId), kiểm tra xem đơn hàng này có thuộc về họ không
             if (request.UserId.HasValue && order.UserId != request.UserId.Value)
             {
-                return ApiResponse<OrderDto>.FailureResult("Bạn không có quyền truy cập đơn hàng này.");
+                throw new UnauthorizedException("Bạn không có quyền truy cập đơn hàng này.");
             }
 
             var orderDto = _mapper.Map<OrderDto>(order);

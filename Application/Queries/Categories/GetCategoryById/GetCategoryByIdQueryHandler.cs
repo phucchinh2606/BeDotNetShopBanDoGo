@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using AutoMapper;
 using Domain.Interfaces;
 using MediatR;
@@ -21,7 +22,7 @@ namespace Application.Queries.Categories.GetCategoryById
             var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
-                throw new Exception("Không tìm thấy danh mục với ID này.");
+                throw new NotFoundException("Không tìm thấy danh mục với ID này.");
             }
 
             // Tự động map từ Entity -> Dto bằng 1 dòng duy nhất

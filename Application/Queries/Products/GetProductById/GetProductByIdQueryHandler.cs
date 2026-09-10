@@ -1,4 +1,5 @@
 ﻿using Application.Commons.DTOs;
+using Application.Commons.Exceptions;
 using Application.Commons.Models;
 using AutoMapper;
 using Domain.Interfaces;
@@ -23,7 +24,7 @@ namespace Application.Queries.Products.GetProductById
 
             if (product == null)
             {
-                return ApiResponse<ProductDto>.FailureResult("Không tìm thấy sản phẩm.");
+                throw new NotFoundException("Sản phẩm", request.ProductId);
             }
 
             var productDto = _mapper.Map<ProductDto>(product);
