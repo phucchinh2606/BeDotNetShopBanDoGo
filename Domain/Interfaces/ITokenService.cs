@@ -1,12 +1,12 @@
 ﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Security.Claims;
 
 namespace Domain.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(User user);
+        string GenerateAccessToken(User user);
+        (string Token, DateTime ExpiryTime) GenerateRefreshToken();
+        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
     }
 }

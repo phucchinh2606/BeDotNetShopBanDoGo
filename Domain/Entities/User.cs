@@ -16,6 +16,10 @@ namespace Domain.Entities
         public UserRole Role { get; set; } = UserRole.Customer;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public Cart Cart { get; set; }
+
+        // Bổ sung cho Refresh Token
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<News> NewsList { get; set; } = new List<News>();
