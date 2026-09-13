@@ -3,9 +3,6 @@ using Application.Commands.Categories.UpdateCategory;
 using Application.Commons.DTOs;
 using AutoMapper;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Application.Commons.Mappings
 {

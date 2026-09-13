@@ -14,6 +14,9 @@ namespace Application.Commons.DTOs
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string ImageUrl { get; set; }
+
+        // Thêm danh sách ảnh phụ ở đây:
+        public List<string> SubImageUrls { get; set; } = new List<string>();
         public ProductStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }

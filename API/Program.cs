@@ -7,7 +7,19 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Đăng ký toàn bộ DI cho API, Application và Infrastructure chỉ với 1 dòng
+// 1. Cấu hình CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Thêm URL của Frontend Next.js
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Bắt buộc nếu dùng Cookie/Auth Header
+    });
+});
+
+// Đăng ký toàn bộ DI cho API, Application và Infrastructure
 builder.Services.AddApiDI(builder.Configuration);
 
 // Cấu hình JWT Authentication
@@ -29,7 +41,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
     };
 });
 
@@ -58,9 +70,13 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // mở Swagger UI tại root
     });
 }
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+// 2. Kích hoạt CORS (Lưu ý: Bắt buộc đặt trước UseAuthentication và UseAuthorization)
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 

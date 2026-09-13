@@ -15,8 +15,13 @@ namespace Application.Commons.Mappings
                 .ForMember(dest => dest.ImageUrl, opt => opt.Ignore()); // ImageUrls sẽ được gán thủ công sau khi upload Cloudinary
 
             CreateMap<Product, ProductDto>()
-                    .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : string.Empty));
-            }
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : string.Empty))
+                // Bổ sung Map danh sách ảnh phụ (lấy tất cả URL ảnh không phải ảnh chính hoặc lấy toàn bộ ProductImages):
+                .ForMember(dest => dest.SubImageUrls, opt => opt.MapFrom(src =>
+                    src.ProductImages != null
+                        ? src.ProductImages.Where(img => !img.IsPrimary).Select(img => img.ImageUrl).ToList()
+                        : new List<string>()));
+        }
         }
     
 }

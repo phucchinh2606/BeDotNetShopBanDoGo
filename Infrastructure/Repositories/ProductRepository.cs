@@ -14,6 +14,7 @@ namespace Infrastructure.Repositories
         {
             return await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
         }
