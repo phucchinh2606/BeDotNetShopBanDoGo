@@ -43,10 +43,19 @@ namespace Infrastructure.Repositories
                                       || p.Description.ToLower().Contains(term));
             }
 
+            // --- THAY ĐỔI TẠI ĐÂY ---
             if (categoryId.HasValue)
             {
-                query = query.Where(p => p.CategoryId == categoryId.Value);
+                // Lấy danh sách ID bao gồm categoryId truyền vào VÀ các category con có ParentId là categoryId
+                var categoryIds = await _context.Categories
+                    .Where(c => c.CategoryId == categoryId.Value || c.ParentId == categoryId.Value)
+                    .Select(c => c.CategoryId)
+                    .ToListAsync();
+
+                // Lọc sản phẩm thuộc danh mục gốc hoặc bất kỳ danh mục con nào của nó
+                query = query.Where(p => categoryIds.Contains(p.CategoryId));
             }
+            // ------------------------
 
             if (minPrice.HasValue)
             {

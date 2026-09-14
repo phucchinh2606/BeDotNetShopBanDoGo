@@ -44,6 +44,7 @@ namespace Infrastructure
 
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             return services;
         }
