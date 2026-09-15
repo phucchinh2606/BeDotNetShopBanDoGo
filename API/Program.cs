@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Thêm URL của Frontend Next.js
+        policy.WithOrigins("http://localhost:3000", "https://fe-next-js-shop-ban-go.vercel.app/") // Thêm URL của Frontend Next.js
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // Bắt buộc nếu dùng Cookie/Auth Header
