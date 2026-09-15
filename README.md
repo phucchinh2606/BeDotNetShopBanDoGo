@@ -18,17 +18,32 @@ Hệ thống Backend RESTful API chuyên biệt cho trang thương mại điện
 
 ---
 
+✨ Tính Năng Chính
+Quản lý Sản Phẩm & Danh Mục: Quản lý thông tin đồ gỗ, chất liệu (Gụ, Hương, Gõ...), loại vân, kích thước chuẩn Lỗ Ban.
+
+Xác thực & Phân quyền (JWT): Đăng ký, đăng nhập, cấp Refresh Token, phân quyền Client / Admin.
+
+Thanh Toán Trực Tuyến (PayOS): Tạo mã QR thanh toán ngân hàng tự động, xử lý Webhook cập nhật đơn hàng tức thì.
+
+Thông Báo Real-time (SignalR): Áp dụng cho chatbotAI phản hồi thời gian thực.
+
+Tư Vấn AI (Chatbot AI): Hỗ trợ khách hàng tìm kiếm sản phẩm theo nhu cầu và tư vấn phong thủy đồ gỗ.
+
+Tải Ảnh Lên Cloud (Cloudinary): Tự động tối ưu dung lượng và phân giải ảnh gỗ trước khi lưu trữ trên mây.
+
 ## 🏗️ Kiến Trúc Hệ Thống (Clean Architecture)
 
 Dự án được chia làm 4 layer độc lập tuân thủ nguyên lý Dependency Inversion:
 
 ```text
-├── src/
-│   ├── Core/
-│   │   ├── Domain/              # Entities, Enums, Value Objects, Exceptions
-│   │   └── Application/         # CQRS (Commands/Queries), DTOs, Interfaces, Validators (FluentValidation)
-│   ├── Infrastructure/
-│   │   ├── Infrastructure/      # External Services (PayOS, Cloudinary, Chatbot AI, SignalR Hubs)
-│   │   └── Persistence/         # EF Core DbContext, Migrations, Repositories Implementation
-│   └── Presentation/
-│       └── WebAPI/              # Controllers, Middlewares, Program.cs, Configurations
+├── BeWoodProductEcom.sln
+│
+├── Domain/              # Core Layer: Entities, Enums, Interface repositories
+│
+├── Application/         # Core Layer: CQRS (Commands/Queries), DTOs, Interfaces, FluentValidation
+│
+├── Infrastructure/      # External Layer: EF Core DbContext, Migrations, Repositories, Services (PayOS, Cloudinary, Chatbot AI, SignalR)
+│
+└── API/                 # Presentation Layer: Controllers, Middlewares, Program.cs, AppSettings Configurations
+
+
