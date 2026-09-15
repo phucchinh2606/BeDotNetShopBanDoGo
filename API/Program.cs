@@ -1,4 +1,5 @@
 using API;
+using API.Hubs;
 using API.Middlewares;
 using Application.Commons.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -52,8 +53,16 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddHttpContextAccessor();
-var app = builder.Build();
 
+// 1. Thêm MemoryCache & SignalR
+builder.Services.AddMemoryCache();
+builder.Services.AddSignalR();
+
+
+
+var app = builder.Build();
+// 2. Map SignalR Hub Endpoint
+app.MapHub<ChatHub>("/chatHub");
 // Tự động seed tài khoản Admin khi khởi động ứng dụng
 using (var scope = app.Services.CreateScope())
 {

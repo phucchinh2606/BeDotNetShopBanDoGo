@@ -23,5 +23,6 @@ namespace Domain.Entities
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<News> NewsList { get; set; } = new List<News>();
+        public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
     }
 }

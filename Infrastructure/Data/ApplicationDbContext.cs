@@ -17,6 +17,7 @@ namespace Infrastructure.Data
         public DbSet<News> News { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,16 @@ namespace Infrastructure.Data
             modelBuilder.Entity<News>()
                 .Property(n => n.Status)
                 .HasConversion<string>();
+
+            // Sinh GUID mặc định cho ChatMessageId
+            modelBuilder.Entity<ChatMessage>().Property(e => e.ChatMessageId).HasDefaultValueSql("gen_random_uuid()");
+
+            // Mối quan hệ ChatMessage -> User (Cho phép Null nếu khách vãng lai chat)
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.User)
+                .WithMany(u => u.ChatMessages)
+                .HasForeignKey(cm => cm.UserId)
+                .OnDelete(DeleteBehavior.SetNull); // Nếu xóa User thì giữ lại lịch sử chat, gán UserId = null
 
             // 2. Cấu hình tự động sinh Guid cho các khóa chính bằng hàm gen_random_uuid() của PostgreSQL
             modelBuilder.Entity<User>().Property(e => e.UserId).HasDefaultValueSql("gen_random_uuid()");

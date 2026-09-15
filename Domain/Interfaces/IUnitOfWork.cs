@@ -12,6 +12,7 @@
         IUserRepository Users { get; }
         ICartRepository Carts { get; }
         ICartItemRepository CartItems { get; }
+        IChatMessageRepository ChatMessages { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

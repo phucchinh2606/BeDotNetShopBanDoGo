@@ -17,6 +17,7 @@ namespace Infrastructure.Repositories
         public IUserRepository Users { get; }
         public ICartRepository Carts { get; }
         public ICartItemRepository CartItems { get; }
+        public IChatMessageRepository ChatMessages { get; }
 
         public UnitOfWork(
             ApplicationDbContext context,
@@ -29,7 +30,8 @@ namespace Infrastructure.Repositories
             IReviewRepository reviewRepository,
             IUserRepository userRepository,
             ICartRepository cartRepository,
-            ICartItemRepository cartItemRepository)
+            ICartItemRepository cartItemRepository,
+            IChatMessageRepository chatMessages)
         {
             _context = context;
             Categories = categoryRepository;
@@ -42,6 +44,7 @@ namespace Infrastructure.Repositories
             Users = userRepository;
             Carts = cartRepository;
             CartItems = cartItemRepository;
+            ChatMessages = chatMessages;
         }
 
         // Đã cập nhật: Bổ sung tham số cancellationToken (mặc định default)
