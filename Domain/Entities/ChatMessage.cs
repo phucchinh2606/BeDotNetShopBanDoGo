@@ -7,7 +7,7 @@
         public string UserMessage { get; set; }
         public string BotResponse { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        public string? SessionId { get; set; } // Mã định danh phiên chat của khách vãng lai
         public User User { get; set; }
     }
 }

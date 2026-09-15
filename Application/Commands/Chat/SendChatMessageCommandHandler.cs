@@ -28,8 +28,13 @@ namespace Application.Commands.Chat
                 return ApiResponse<ChatResponseDto>.FailureResult("Nội dung tin nhắn không được để trống.");
             }
 
-            // 1. Lấy context sản phẩm từ MemoryCache
-            string contextData = await _cache.GetOrCreateAsync("AI_PRODUCT_CONTEXT", async entry =>
+            // 1. Quản lý SessionId: Sử dụng SessionId gửi lên hoặc sinh mới nếu chưa có
+            string activeSessionId = string.IsNullOrWhiteSpace(request.SessionId)
+                ? Guid.NewGuid().ToString()
+                : request.SessionId;
+
+            // 2. Lấy Context danh sách sản phẩm từ MemoryCache
+            string productContext = await _cache.GetOrCreateAsync("AI_PRODUCT_CONTEXT", async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
 
@@ -43,14 +48,36 @@ namespace Application.Commands.Chat
                 return sb.ToString();
             });
 
-            // 2. Gọi Gemini Service
-            var botReply = await _geminiService.GenerateChatResponseAsync(request.Message, contextData, cancellationToken);
+            // 3. TỐI ƯU NGỮ CẢNH: Lấy 3 tin nhắn gần nhất theo SessionId để giữ mạch trò chuyện
+            var recentHistory = (await _unitOfWork.ChatMessages.GetByUserIdAsync(request.UserId ?? Guid.Empty)) // Hoặc Query theo SessionId
+                ?.Where(m => m.SessionId == activeSessionId)
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(3)
+                .OrderBy(m => m.CreatedAt)
+                .ToList();
 
-            // 3. Tự động lưu lịch sử hội thoại vào Database
+            var conversationHistoryBuilder = new StringBuilder();
+            if (recentHistory != null && recentHistory.Any())
+            {
+                conversationHistoryBuilder.AppendLine("LỊCH SỬ TRÒ CHUYỆN GẦN ĐÂY:");
+                foreach (var history in recentHistory)
+                {
+                    conversationHistoryBuilder.AppendLine($"Khách: {history.UserMessage}");
+                    conversationHistoryBuilder.AppendLine($"AI: {history.BotResponse}");
+                }
+            }
+
+            string fullContext = $"{productContext}\n\n{conversationHistoryBuilder}";
+
+            // 4. Gọi Gemini Service
+            var botReply = await _geminiService.GenerateChatResponseAsync(request.Message, fullContext, cancellationToken);
+
+            // 5. Lưu lịch sử hội thoại vào Database cùng với SessionId
             var chatMessage = new ChatMessage
             {
                 ChatMessageId = Guid.NewGuid(),
-                UserId = request.UserId, // Null nếu là khách chưa đăng nhập
+                SessionId = activeSessionId,
+                UserId = request.UserId,
                 UserMessage = request.Message,
                 BotResponse = botReply,
                 CreatedAt = DateTime.UtcNow
@@ -59,8 +86,12 @@ namespace Application.Commands.Chat
             await _unitOfWork.ChatMessages.AddAsync(chatMessage);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // 4. Trả về kết quả
-            return ApiResponse<ChatResponseDto>.SuccessResult(new ChatResponseDto { Response = botReply }, "Phản hồi thành công.");
+            // 6. Trả về kết quả kèm SessionId cho Client
+            return ApiResponse<ChatResponseDto>.SuccessResult(new ChatResponseDto
+            {
+                SessionId = activeSessionId,
+                Response = botReply
+            }, "Phản hồi thành công.");
         }
     }
 }
