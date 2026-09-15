@@ -6,8 +6,8 @@ namespace Domain.Interfaces
     public interface IOrderRepository : IGenericRepository<Order> {
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(Guid userId);
 
-        // Bổ sung hàm lấy tất cả đơn hàng có phân trang & lọc cho Admin
-        Task<(IEnumerable<Order> Orders, int TotalCount)> GetAdminOrdersAsync(
+        // Đã đồng bộ kiểu trả về List<Order>
+        Task<(List<Order> Items, int TotalCount)> GetAdminOrdersAsync(
             int pageNumber,
             int pageSize,
             OrderStatus? orderStatus,
@@ -19,5 +19,7 @@ namespace Domain.Interfaces
 
         // Dùng cho Command (Hủy đơn, Cập nhật trạng thái) - Có Tracking
         Task<Order?> GetOrderByIdForUpdateAsync(Guid orderId);
+
+        Task<Order?> GetByOrderCodeAsync(long orderCode);
     }
 }

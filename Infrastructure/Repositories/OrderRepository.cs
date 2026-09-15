@@ -23,17 +23,16 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<(IEnumerable<Order> Orders, int TotalCount)> GetAdminOrdersAsync(
-            int pageNumber,
-            int pageSize,
-            OrderStatus? orderStatus,
-            PaymentStatus? paymentStatus,
-            string? searchTerm)
+        public async Task<(List<Order> Items, int TotalCount)> GetAdminOrdersAsync(
+    int pageNumber,
+    int pageSize,
+    OrderStatus? orderStatus,
+    PaymentStatus? paymentStatus,
+    string? searchTerm)
         {
             var query = _context.Orders
-                .AsNoTracking() // Tối ưu hiệu năng đọc
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
-                    .ThenInclude(od => od.Product)
                 .AsQueryable();
 
             // 1. Lọc theo trạng thái đơn hàng
@@ -48,25 +47,31 @@ namespace Infrastructure.Repositories
                 query = query.Where(o => o.PaymentStatus == paymentStatus.Value);
             }
 
-            // 3. Tìm kiếm theo Từ khóa (Chuẩn hóa cho PostgreSQL)
+            // 3. Tìm kiếm theo Tên, SĐT, hoặc OrderCode / OrderId
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var search = searchTerm.Trim();
-                query = query.Where(o => EF.Functions.ILike(o.ShippingAddress, $"%{search}%")
-                                      || EF.Functions.ILike(o.OrderId.ToString(), $"%{search}%"));
+                var term = searchTerm.Trim().ToLower();
+
+                // Kiểm tra xem người dùng có gõ chữ số (mã OrderCode) hay không
+                bool isNumber = long.TryParse(term, out long searchOrderCode);
+
+                query = query.Where(o =>
+                    o.User.FullName.ToLower().Contains(term) ||
+                    o.User.PhoneNumber.Contains(term) ||
+                    (isNumber && o.OrderCode == searchOrderCode) || // Tim kiem theo OrderCode
+                    o.OrderId.ToString().ToLower().Contains(term)
+                );
             }
 
-            // 4. Đếm tổng số bản ghi
             int totalCount = await query.CountAsync();
 
-            // 5. Phân trang
-            var orders = await query
+            var items = await query
                 .OrderByDescending(o => o.OrderDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (orders, totalCount);
+            return (items, totalCount);
         }
 
         public async Task<Order?> GetOrderByIdWithDetailsAsync(Guid orderId)
@@ -84,6 +89,13 @@ namespace Infrastructure.Repositories
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
+
+        public async Task<Order?> GetByOrderCodeAsync(long orderCode)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
         }
     }
 }

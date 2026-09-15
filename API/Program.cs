@@ -51,7 +51,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
-
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Tự động seed tài khoản Admin khi khởi động ứng dụng

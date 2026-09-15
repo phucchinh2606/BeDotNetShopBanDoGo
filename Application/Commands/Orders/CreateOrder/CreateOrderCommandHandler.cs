@@ -106,10 +106,14 @@ namespace Application.Commands.Orders.CreateOrder
             // 8. Lưu đơn hàng
             await _unitOfWork.Orders.AddAsync(order);
 
-            // 9. CHỈ XÓA CÁC CARTITEM ĐÃ ĐƯỢC CHỌN
-            foreach (var item in selectedCartItems)
+            // Chỉ xóa cart item ngay với COD. Với PayOS, giữ lại đến khi webhook
+            // xác nhận thanh toán thành công để người dùng có thể thanh toán lại.
+            if (request.PaymentMethod == Domain.Enums.PaymentMethod.COD)
             {
-                _unitOfWork.CartItems.Delete(item);
+                foreach (var item in selectedCartItems)
+                {
+                    _unitOfWork.CartItems.Delete(item);
+                }
             }
 
             await _unitOfWork.SaveChangesAsync();

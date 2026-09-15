@@ -2,9 +2,7 @@
 {
     public enum PaymentMethod
     {
-        COD,
-        VnPay,
-        Momo,
-        Stripe
+        COD = 0,
+        PayOS = 1
     }
 }

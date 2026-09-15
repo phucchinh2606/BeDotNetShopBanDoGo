@@ -15,7 +15,7 @@ namespace Domain.Entities
         public string PaymentMethod { get; set; }
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
-
+        public long OrderCode { get; set; }
         public User User { get; set; }
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
     }

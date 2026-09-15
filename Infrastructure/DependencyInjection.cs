@@ -7,6 +7,7 @@ using Infrastructure.Services.Payments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PayOS;
 
 namespace Infrastructure
 {
@@ -44,7 +45,19 @@ namespace Infrastructure
 
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+
+            
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+            var payOsOptions = new PayOSOptions
+            {
+                ClientId = configuration["PayOS:ClientId"]!,
+                ApiKey = configuration["PayOS:ApiKey"]!,
+                ChecksumKey = configuration["PayOS:ChecksumKey"]!
+            };
+            services.AddSingleton(new PayOSClient(payOsOptions));
+
+            services.AddScoped<IPaymentService, PayOsPaymentService>();
 
             return services;
         }
