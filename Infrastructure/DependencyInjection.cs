@@ -58,6 +58,7 @@ namespace Infrastructure
             services.AddSingleton(new PayOSClient(payOsOptions));
 
             services.AddScoped<IPaymentService, PayOsPaymentService>();
+            services.AddHttpClient<IGeminiService,GeminiService>();
 
             return services;
         }
