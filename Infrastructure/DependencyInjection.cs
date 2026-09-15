@@ -45,6 +45,7 @@ namespace Infrastructure
 
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 
             
             services.AddScoped<ICurrentUserService, CurrentUserService>();
