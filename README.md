@@ -1,6 +1,7 @@
 # 🪵 E-Commerce Wood Shop Backend (.NET 10)
 
 Hệ thống Backend RESTful API chuyên biệt cho trang thương mại điện tử đồ gỗ mỹ nghệ cao cấp. Dự án được phát triển trên nền tảng **.NET 10 mới nhất**, áp dụng các nguyên lý thiết kế phần mềm tiên tiến nhằm đảm bảo tính mở rộng, bảo mật cao và hiệu năng tối ưu.
+Vì dự án được deploy trên render với free option nên lúc khởi động app sẽ mất khoảng 1 phút.
 
 ---
 
